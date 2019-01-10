@@ -13,7 +13,7 @@ def whichTrans(base1, base2):
 def main():
 
     # open file, extract data
-    dataFile = open('rosalind_tran.txt','r')
+    dataFile = open('example.txt','r')
     dnaList = dataFile.read().replace('\n','').split('>')
     dataFile.close()
 
