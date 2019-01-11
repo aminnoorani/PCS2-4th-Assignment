@@ -1,45 +1,86 @@
-import sys
-import re
-from Bio import SeqIO
+def to_protein(s):
+    p = str()
+    i = 0
 
-DNA_CODON_TABLE = {
-'TTT': 'F',     'CTT': 'L',     'ATT': 'I',     'GTT': 'V',
-'TTC': 'F',     'CTC': 'L',     'ATC': 'I',     'GTC': 'V',
-'TTA': 'L',     'CTA': 'L',     'ATA': 'I',     'GTA': 'V',
-'TTG': 'L',     'CTG': 'L',     'ATG': 'M',     'GTG': 'V',
-'TCT': 'S',     'CCT': 'P',     'ACT': 'T',     'GCT': 'A',
-'TCC': 'S',     'CCC': 'P',     'ACC': 'T',     'GCC': 'A',
-'TCA': 'S',     'CCA': 'P',     'ACA': 'T',     'GCA': 'A',
-'TCG': 'S',     'CCG': 'P',     'ACG': 'T',     'GCG': 'A',
-'TAT': 'Y',     'CAT': 'H',     'AAT': 'N',     'GAT': 'D',
-'TAC': 'Y',     'CAC': 'H',     'AAC': 'N',     'GAC': 'D',
-'TAA': '*',     'CAA': 'Q',     'AAA': 'K',     'GAA': 'E',
-'TAG': '*',     'CAG': 'Q',     'AAG': 'K',     'GAG': 'E',
-'TGT': 'C',     'CGT': 'R',     'AGT': 'S',     'GGT': 'G',
-'TGC': 'C',     'CGC': 'R',     'AGC': 'S',     'GGC': 'G',
-'TGA': '*',     'CGA': 'R',     'AGA': 'R',     'GGA': 'G',
-'TGG': 'W',     'CGG': 'R',     'AGG': 'R',     'GGG': 'G'}
+    while (i < len(s)):
+        t = s[i:i+3]
+        if (t == "UUU" or t == "UUC"):
+            p += "F"
+        elif (t == "UUA" or t == "UUG" or
+              t == "CUU" or t == "CUC" or
+              t == "CUA" or t == "CUG"):
+            p += "L"
+        elif (t == "UCU" or t == "UCC" or
+              t == "UCA" or t == "UCG" or
+              t == "AGU" or t == "AGC"):
+            p += "S"
+        elif (t == "UAU" or t == "UAC"):
+            p += "Y"
+        elif (t == "UGU" or t == "UGC"):
+            p += "C"
+        elif (t == "UGG"):
+            p += "W"
+        elif (t == "CCU" or t == "CCC" or
+              t == "CCA" or t == "CCG"):
+            p += "P"
+        elif (t == "CAU" or t == "CAC"):
+            p += "H"
+        elif (t == "CAA" or t == "CAG"):
+            p += "Q"
+        elif (t == "CGU" or t == "CGC" or
+              t == "CGA" or t == "CGG" or
+              t == "AGA" or t == "AGG"):
+            p += "R"
+        elif (t == "AUU" or t == "AUC" or
+              t == "AUA"):
+            p += "I"
+        elif (t == "AUG"):
+            p += "M"
+        elif (t == "ACU" or t == "ACC" or
+              t == "ACA" or t == "ACG"):
+            p += "T"
+        elif (t == "AAU" or t == "AAC"):
+            p += "N"
+        elif (t == "AAA" or t == "AAG"):
+            p += "K"
+        elif (t == "GUU" or t == "GUC" or
+              t == "GUA" or t == "GUG"):
+            p += "V"
+        elif (t == "GCU" or t == "GCC" or
+              t == "GCA" or t == "GCG"):
+            p += "A"
+        elif (t == "GAU" or t == "GAC"):
+            p += "D"
+        elif (t == "GAA" or t == "GAG"):
+            p += "E"
+        elif (t == "GGU" or t == "GGC" or
+              t == "GGA" or t == "GGG"):
+            p += "G"
+        elif (t == "UAA" or t == "UAG" or
+              t == "UGA"):
+            return p
+        i += 3
 
-def translation(sequence,table):
-	prot = []
-	for i in range(0,len(sequence),3):
-		codon = sequence[i:i+3]
-		if len(codon) == 3:
-			prot.append(table[codon])
-		else:
-			return prot
-		if prot[-1] == "*":
-			prot.pop(-1)
-	return "".join(prot)
-seqs = []
-for record in SeqIO.parse(sys.argv[1],"fasta"):
-	seqs.append(record.seq)
-my_seq = seqs[0]
+    return p
 
-for intron in seqs[1:]:
-	start = my_seq.find(intron)
-	if start != -1:
-		my_seq = my_seq[0:start] + my_seq[start+len(intron):]
+def to_rna(s):
+    return s.replace('T', 'U')
 
-#print my_seq
-print(translation(my_seq,DNA_CODON_TABLE))
+f = open("rosalind_splc (1).txt")
+lst = f.read()
+f.close()
+
+lst = lst.replace('\n', '')
+lst = lst.split('>')
+dna = []
+
+for item in lst:
+    if (len(item) < 1):
+        continue
+    dna.append(item[13::])
+
+rna = to_rna(dna[0])
+for i in range(1, len(dna)):
+    rna = rna.replace(to_rna(dna[i]), "")
+
+print(to_protein(rna))
