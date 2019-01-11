@@ -1,5 +1,5 @@
-n =          # copy and paste n and m
-m =
+n = 91        # copy and paste n and m
+m = 20
 bunnies = [1, 1]
 months = 2
 while months < n:
