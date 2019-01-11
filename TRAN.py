@@ -1,46 +1,42 @@
-def whichTrans(base1, base2):
-    if (base1 == 'A' and base2 == 'G'):
-        return 'transition'
-    if (base1 == 'G' and base2 == 'A'):
-        return 'transition'
-    if (base1 == 'C' and base2 == 'T'):
-        return 'transition'
-    if (base1 == 'T' and base2 == 'C'):
-        return 'transition' # pyridine-pyridine or purine-purine switch
-    else:
-        return 'transversion' # pyridine-purine or purine-pyridine switch
+def count_transitions(s, t):
+    count = 0
+    for i in range(0, len(s)):
+        if ((s[i] == 'A' and t[i] == 'G') or
+            (s[i] == 'G' and t[i] == 'A') or
+            (s[i] == 'C' and t[i] == 'T') or
+            (s[i] == 'T' and t[i] == 'C')):
+            count += 1
+    return count
 
-def main():
+def count_transversions(s, t):
+    count = 0
+    for i in range(0, len(s)):
+        if ((s[i] == 'A' and t[i] == 'C') or
+            (s[i] == 'A' and t[i] == 'T') or
+            (s[i] == 'C' and t[i] == 'A') or
+            (s[i] == 'C' and t[i] == 'G') or
+            (s[i] == 'G' and t[i] == 'C') or
+            (s[i] == 'G' and t[i] == 'T') or
+            (s[i] == 'T' and t[i] == 'A') or
+            (s[i] == 'T' and t[i] == 'G')):
+            count += 1
+    return count
 
-    # open file, extract data
-    dataFile = open('example.txt','r')
-    dnaList = dataFile.read().replace('\n','').split('>')
-    dataFile.close()
+def get_transition_transversion_ratio(s, t):
+    return count_transitions(s, t) / count_transversions(s, t)
 
-    # create variables to manipulate
-    string1 = dnaList[1][13:]
-    string2 = dnaList[2][13:]
-    transitionCount = 0
-    transversionCount = 0
+f = open("rosalind_tran.txt")
+lst = f.read()
+f.close()
 
-    # find out whether counting point mutations are transitions or transversions
-    for x in range(len(string1)):
-        first = string1[x]
-        second = string2[x]
-        if (first != second):
-            result = whichTrans(first, second)
-            if (result == 'transition'):
-                transitionCount += 1
-            if (result == 'transversion'):
-                transversionCount += 1
+lst = lst.replace('\n', '')
+lst = lst.split('>')
+dna = []
 
-    # find transition/transversion ratio
-    ratio = float(transitionCount / transversionCount)
+for item in lst:
+    if (len(item) < 1):
+        continue
 
-    # output results
-    outputFile = open('output.txt','w')
-    outputFile.writelines(str(ratio))
-    outputFile.close()
+    dna.append(item[13::])
 
-if __name__ == "__main__":
-    main()
+print(get_transition_transversion_ratio(dna[0], dna[1]))
