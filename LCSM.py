@@ -1,33 +1,34 @@
-from sys import argv
-def lcs(s1,s2):
-	m = [[0] * (1 + len(s2)) for i in xrange(1+len(s1))]
-	longest,x_longest = 0,0
-	for x in xrange(1,1+len(s1)):
-		for y in xrange(1,1+len(s2)):
-			if s1[x-1] == s2[y-1]:
-				m[x][y] = m[x-1][y-1] + 1
-				if m[x][y] > longest:
-					longest = m[x][y]
-					x_longest = x
-			else:
-				m[x][y] = 0
-	return s1[x_longest - longest : x_longest]
+def find_lca(lst):
+    lcas = set()
+    last = lst.pop()
+    for i in range(len(last)):
+        common = True
+        n = i
+        while common:
+            n += 1
+            for dna in lst:
+                if last[i:n] not in dna:
+                    common = False
+                    n -= 1
+                    break
+            if common is False or n > len(last):
+                break
+            lcas.add(last[i:n])
 
-handle = open(argv[1])
-genes = []
-gene = []
-for l in handle:
-	if l[0] == '>':
-		gene = ''.join(gene)
-		genes.append(gene)
-		gene = []
-		continue
-	else:
-		gene.append(l.strip())
-gene = ''.join(gene)
-genes.append(gene)
-my_s = lcs(genes[1],genes[2])
+    lcas = list(lcas)
+    return max(lcas,key=len)
 
-for i in xrange(3,len(genes)):
-	my_s = lcs(genes[i],my_s)
-print(my_s)
+
+with open('rosalind_lcsm.txt', 'r') as file:
+    content = file.read()
+DNAs_number, lines, line_number, DNAs = content.count('>'), content.splitlines(), 0, []
+for i in range(DNAs_number):
+    DNA = ''
+    line_number += 1
+    while lines[line_number][0] != '>':
+        DNA += lines[line_number]
+        line_number += 1
+        if line_number+1 > len(lines):
+            break
+    DNAs.append(DNA)
+print(find_lca(DNAs))
